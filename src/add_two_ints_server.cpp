@@ -8,14 +8,7 @@ using std::placeholders::_1;
 using std::placeholders::_2;
 
 /*
- * TODO: Create a Class named 'AddTwoIntsServer' that inherits from rclcpp::Node.
- * Requirements:
- * 1. The constructor should name the node "add_two_ints_server".
- * 2. Create a service named "add_two_ints" using example_interfaces::srv::AddTwoInts.
- * 3. The service callback should:
- *    - Add request->a and request->b
- *    - Store result in response->sum
- *    - Log: "Incoming request: a=X, b=Y" and "Sending response: sum=Z"
+ * COMPLETED: Class named 'AddTwoIntsServer' that inherits from rclcpp::Node.
  */
 
 class AddTwoIntsServer : public rclcpp::Node
@@ -25,10 +18,31 @@ public:
         : Node("add_two_ints_server")
     {
         // TODO: Create the service here
+        // Service Name: "add_two_ints"
+        // Callback: handle_add_two_ints
+        service_ = this->create_service<example_interfaces::srv::AddTwoInts>(
+            "add_two_ints",
+            std::bind(&AddTwoIntsServer::handle_add_two_ints, this, _1, _2));
+        
+        RCLCPP_INFO(this->get_logger(), "Service server has been started.");
     }
 
 private:
     // TODO: Define the service callback function here
+    // The callback must accept a Request (input) and a Response (output)
+    void handle_add_two_ints(
+        const std::shared_ptr<example_interfaces::srv::AddTwoInts::Request> request,
+        std::shared_ptr<example_interfaces::srv::AddTwoInts::Response> response)
+    {
+        // 1. Logic: Add the two integers
+        response->sum = request->a + request->b;
+
+        // 2. Log Incoming Request
+        RCLCPP_INFO(this->get_logger(), "Incoming request: a=%ld, b=%ld", request->a, request->b);
+
+        // 3. Log Outgoing Response
+        RCLCPP_INFO(this->get_logger(), "Sending response: sum=%ld", response->sum);
+    }
 
     rclcpp::Service<example_interfaces::srv::AddTwoInts>::SharedPtr service_;
 };
